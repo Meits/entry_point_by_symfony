@@ -4,4 +4,4 @@ index_route:
 
 page_route:
     path: /page/{alias}
-    defaults: { _controller: 'PageController::show' }
+    defaults: { _controller: 'App\Http\PageController::show' }

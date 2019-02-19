@@ -7,13 +7,12 @@
  */
 
 namespace App\Http;
-use Symfony\Component\HttpFoundation\Response;
 
 
-class IndexController
+class IndexController extends Controller
 {
     public function indexAction() {
         
-        return new Response('hello');
+        return $this->render("index",['title' => "kuuuu"]);
     }
 }
