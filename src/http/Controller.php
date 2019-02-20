@@ -9,10 +9,11 @@
 namespace App\Http;
 
 
-use App\System\View;
+use App\System\View\View;
 use Symfony\Component\HttpFoundation\Response;
+use App\System\Controller\IController;
 
-class Controller
+class Controller implements IController
 {
     protected $view;
 
@@ -20,7 +21,7 @@ class Controller
         $this->view = new View();
     }
 
-    protected function render($path, $data = []) {
+    public function render($path, $data = []) {
         return new Response($this->view->make($path, $data));
     }
 }

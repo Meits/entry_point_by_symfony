@@ -26,7 +26,20 @@ class App {
     private $controller;
     private $arguments;
 
-    public function __construct()
+    private $basePath;
+
+    public static $instance = null;
+    
+    public static function getInstance($path = null)
+    {
+        if (is_null(static::$instance)) {
+            static::$instance = new static($path);
+        }
+
+        return static::$instance;
+    }
+    
+    private function __construct($basePath)
     {
         $this->request = $this->setRequest();
 
@@ -36,6 +49,12 @@ class App {
 
         $this->routes = $this->router->getRouteCollection();
 
+        $this->basePath = $basePath;
+
+    }
+
+    public function getBasePath() {
+        return $this->basePath;
     }
 
     public function setRequest() {
@@ -64,8 +83,8 @@ class App {
         $fileLocator = new FileLocator(array(__DIR__));
         $router = new Router(
             new YamlFileLoader($fileLocator),
-            '../../config/routes.yaml',
-            array('cache_dir' => '../storage/cache')
+            BASEPATH.'/config/routes.yaml',
+            array('cache_dir' => BASEPATH.'/storage/cache')
         );
         return $router;
     }

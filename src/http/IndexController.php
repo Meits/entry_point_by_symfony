@@ -12,7 +12,6 @@ namespace App\Http;
 class IndexController extends Controller
 {
     public function indexAction() {
-        
         return $this->render("index",['title' => "kuuuu"]);
     }
 }
