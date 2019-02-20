@@ -23,5 +23,8 @@
         "symfony/http-foundation": "^4.2",
         "symfony/http-kernel": "^4.2",
         "symfony/templating": "^4.2"
+    },
+    "require-dev": {
+        "symfony/var-dumper": "^4.2"
     }
 }
