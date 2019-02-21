@@ -9269,3 +9269,14 @@ input[type=range]::-ms-thumb {
   }
 }
 
+body {
+  background-color: #12595c;
+}
+
+.main-title {
+  font-size: 10em;
+  color: #fff;
+  font-weight: 500;
+  margin: 10% 30%;
+}
+

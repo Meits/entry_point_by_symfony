@@ -29,6 +29,8 @@ class App {
     private $basePath;
 
     public static $instance = null;
+
+    private $container = [];
     
     public static function getInstance($path = null)
     {
@@ -119,6 +121,17 @@ class App {
         }
 
         $response->send();
+    }
+
+    public function add($key, $object) {
+        $this->container[$key] = $object;
+        return $object;
+    }
+    public function get($key) {
+        if(isset($this->container[$key])) {
+            return $this->container[$key];
+        }
+        return null;
     }
 
 }

@@ -7,7 +7,6 @@ $app = App\System\App::getInstance(BASEPATH);
 $config = new \App\System\Config\Config('config');
 $config->addConfig('routes.yaml');
 
-
-dump($config->getConfig());
+$app->add("config",$config);
 
 return $app;
