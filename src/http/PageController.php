@@ -12,9 +12,9 @@ namespace App\Http;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class PageController
+class PageController  extends Controller
 {
     public function show(Request $request, $alias = 'ku') {
-        return new Response($alias);
+        return $this->render("page",['alias' => $alias]);
     }
 }
