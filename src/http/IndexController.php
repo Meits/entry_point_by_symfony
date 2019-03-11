@@ -11,7 +11,15 @@ namespace App\Http;
 
 class IndexController extends Controller
 {
+
+
+    public function __construct()
+    {
+        parent::__construct();
+    }
+
     public function indexAction() {
+
         return $this->render("index",['title' => "kuuuu"]);
     }
 }
