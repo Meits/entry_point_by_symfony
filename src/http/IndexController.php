@@ -9,6 +9,8 @@
 namespace App\Http;
 
 
+use App\Entities\Book;
+
 class IndexController extends Controller
 {
 
@@ -20,6 +22,7 @@ class IndexController extends Controller
 
     public function indexAction() {
 
+        //$em = app()->get('orm')->getEntityManager();
         return $this->render("index",['title' => "kuuuu"]);
     }
 }

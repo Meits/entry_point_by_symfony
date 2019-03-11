@@ -117,7 +117,7 @@ class App {
         } catch (Routing\Exception\ResourceNotFoundException $exception) {
             $response = new Response('Not Found', 404);
         } catch (\Exception $exception) {
-            $response = new Response('An error occurred', 500);
+            $response = new Response($exception->getMessage(), 500);
         }
 
         $response->send();
