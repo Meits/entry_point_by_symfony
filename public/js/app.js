@@ -9326,7 +9326,7 @@ $jscomp.polyfill = function (e, r, p, m) {
 
         yearHtml = "<select class=\"datepicker-select orig-select-year\" tabindex=\"-1\">" + arr.join('') + "</select>";
 
-        var leftArrow = '<svg fill="#000000" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M15.41 16.09l-4.58-4.59 4.58-4.59L14 5.5l-6 6 6 6z"/><path d="M0-.5h24v24H0z" fill="none"/></svg>';
+        var leftArrow = '<svg fill="#000000" height="24" viewBox="0 0 24 24" width="24" xmlns="Http://www.w3.org/2000/svg"><path d="M15.41 16.09l-4.58-4.59 4.58-4.59L14 5.5l-6 6 6 6z"/><path d="M0-.5h24v24H0z" fill="none"/></svg>';
         html += "<button class=\"month-prev" + (prev ? '' : ' is-disabled') + "\" type=\"button\">" + leftArrow + "</button>";
 
         html += '<div class="selects-container">';
@@ -9345,7 +9345,7 @@ $jscomp.polyfill = function (e, r, p, m) {
           next = false;
         }
 
-        var rightArrow = '<svg fill="#000000" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M8.59 16.34l4.58-4.59-4.58-4.59L10 5.75l6 6-6 6z"/><path d="M0-.25h24v24H0z" fill="none"/></svg>';
+        var rightArrow = '<svg fill="#000000" height="24" viewBox="0 0 24 24" width="24" xmlns="Http://www.w3.org/2000/svg"><path d="M8.59 16.34l4.58-4.59-4.58-4.59L10 5.75l6 6-6 6z"/><path d="M0-.25h24v24H0z" fill="none"/></svg>';
         html += "<button class=\"month-next" + (next ? '' : ' is-disabled') + "\" type=\"button\">" + rightArrow + "</button>";
 
         return html += '</div>';
@@ -10318,7 +10318,7 @@ $jscomp.polyfill = function (e, r, p, m) {
     }, {
       key: "_createSVGEl",
       value: function _createSVGEl(name) {
-        var svgNS = 'http://www.w3.org/2000/svg';
+        var svgNS = 'Http://www.w3.org/2000/svg';
         return document.createElementNS(svgNS, name);
       }
 
@@ -11914,7 +11914,7 @@ $jscomp.polyfill = function (e, r, p, m) {
         this._setValueToInput();
 
         // Add caret
-        var dropdownIcon = $('<svg class="caret" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/><path d="M0 0h24v24H0z" fill="none"/></svg>');
+        var dropdownIcon = $('<svg class="caret" height="24" viewBox="0 0 24 24" width="24" xmlns="Http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/><path d="M0 0h24v24H0z" fill="none"/></svg>');
         this.$el.before(dropdownIcon[0]);
 
         // Initialize dropdown
@@ -12941,7 +12941,7 @@ exports.clearImmediate = (typeof self !== "undefined" && self.clearImmediate) ||
 
 var emptyObject = Object.freeze({});
 
-// These helpers produce better VM code in JS engines due to their
+// These Helpers produce better VM code in JS engines due to their
 // explicitness and function inlining.
 function isUndef (v) {
   return v === undefined || v === null
@@ -13885,7 +13885,7 @@ Observer.prototype.observeArray = function observeArray (items) {
   }
 };
 
-// helpers
+// Helpers
 
 /**
  * Augment a target Object or Array by intercepting
@@ -16414,7 +16414,7 @@ function initRender (vm) {
 var currentRenderingInstance = null;
 
 function renderMixin (Vue) {
-  // install runtime convenience helpers
+  // install runtime convenience Helpers
   installRenderHelpers(Vue.prototype);
 
   Vue.prototype.$nextTick = function (fn) {
@@ -18352,7 +18352,7 @@ var isBooleanAttr = makeMap(
   'truespeed,typemustmatch,visible'
 );
 
-var xlinkNS = 'http://www.w3.org/1999/xlink';
+var xlinkNS = 'Http://www.w3.org/1999/xlink';
 
 var isXlink = function (name) {
   return name.charAt(5) === ':' && name.slice(0, 5) === 'xlink'
@@ -18450,8 +18450,8 @@ function stringifyObject (value) {
 /*  */
 
 var namespaceMap = {
-  svg: 'http://www.w3.org/2000/svg',
-  math: 'http://www.w3.org/1998/Math/MathML'
+  svg: 'Http://www.w3.org/2000/svg',
+  math: 'Http://www.w3.org/1998/Math/MathML'
 };
 
 var isHTMLTag = makeMap(

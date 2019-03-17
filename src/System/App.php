@@ -1,6 +1,10 @@
 <?php
 
 namespace App\System;
+use Symfony\Component\HttpKernel\Controller\ArgumentResolverInterface;
+use Symfony\Component\HttpKernel\Controller\ControllerResolverInterface;
+use Symfony\Component\HttpKernel\HttpKernel;
+use Symfony\Component\Routing\Matcher\UrlMatcherInterface;
 use Symfony\Component\Routing\RequestContext;
 use Symfony\Component\Routing\Router;
 use Symfony\Component\HttpFoundation\Request;
@@ -13,10 +17,9 @@ use Symfony\Component\HttpKernel\Controller;
 use Symfony\Component\Routing\RouteCollection;
 
 use Symfony\Component\Routing;
-use Symfony\Component\HttpKernel;
 
 
-class App {
+class App extends HttpKernel {
 
     private $request;
     public $router;
@@ -41,7 +44,7 @@ class App {
         return static::$instance;
     }
     
-    private function __construct($basePath)
+    /*public function __construct($basePath)
     {
         $this->request = $this->setRequest();
 
@@ -53,6 +56,21 @@ class App {
 
         $this->basePath = $basePath;
 
+    }*/
+
+    protected $matcher;
+    protected $resolver;
+    protected $dispatcher;
+    protected $argumentResolver;
+
+    public function __construct(ControllerResolverInterface $resolver, UrlMatcherInterface $matcher,ArgumentResolverInterface $argumentResolver)
+    {
+        //$this->dispatcher = $dispatcher;
+        $this->matcher = $matcher;
+        $this->resolver = $resolver;
+        $this->argumentResolver = $argumentResolver;
+
+        $this->request = $this->setRequest();
     }
 
     public function getBasePath() {
@@ -104,13 +122,13 @@ class App {
 
     public function run() {
         
-        $matcher = new Routing\Matcher\UrlMatcher($this->routes, $this->requestContext);
+        //$matcher = new Routing\Matcher\UrlMatcher($this->routes, $this->requestContext);
 
         try {
-            $this->request->attributes->add($matcher->match($this->request->getPathInfo()));
+            $this->request->attributes->add($this->matcher->match($this->request->getPathInfo()));
             
-            $controller = $this->getController();
-            $arguments =  $this->getArguments($controller);
+            $controller = $this->resolver->getController($this->request);
+            $arguments =  $this->argumentResolver->getArguments($this->request, $controller);
 
             $response = call_user_func_array($controller, $arguments);
             
