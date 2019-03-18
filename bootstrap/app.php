@@ -2,14 +2,12 @@
 
 define('BASEPATH', dirname(__DIR__));
 
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection;
 use Symfony\Component\HttpFoundation;
 use Symfony\Component\HttpKernel;
 use Symfony\Component\Routing;
 use Symfony\Component\EventDispatcher;
-
 
 
 $routes = include("routing.php");
@@ -23,10 +21,26 @@ $containerBuilder->register('request_stack', HttpFoundation\RequestStack::class)
 $containerBuilder->register('controller_resolver', HttpKernel\Controller\ControllerResolver::class);
 $containerBuilder->register('argument_resolver', HttpKernel\Controller\ArgumentResolver::class);
 
+$containerBuilder->register('listener.router', HttpKernel\EventListener\RouterListener::class)
+    ->setArguments([new Reference('matcher'), new Reference('request_stack')])
+;
+$containerBuilder->register('listener.response', HttpKernel\EventListener\ResponseListener::class)
+    ->setArguments(['UTF-8'])
+;
+$containerBuilder->register('listener.exception', HttpKernel\EventListener\ExceptionListener::class)
+    ->setArguments(['Calendar\Controller\ErrorController::exception'])
+;
+$containerBuilder->register('dispatcher', EventDispatcher\EventDispatcher::class)
+    ->addMethodCall('addSubscriber', [new Reference('listener.router')])
+    ->addMethodCall('addSubscriber', [new Reference('listener.response')])
+    ->addMethodCall('addSubscriber', [new Reference('listener.exception')])
+;
+
 $containerBuilder->register('framework',  App\System\App::class)
     ->setArguments([
+        new Reference('dispatcher'),
         new Reference('controller_resolver'),
-        new Reference('matcher'),
+        new Reference('request_stack'),
         new Reference('argument_resolver'),
     ])
 ;

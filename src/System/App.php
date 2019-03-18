@@ -21,7 +21,7 @@ use Symfony\Component\Routing;
 
 class App extends HttpKernel {
 
-    private $request;
+   /* private $request;
     public $router;
     public $routes;
     private $requestContext;
@@ -29,20 +29,20 @@ class App extends HttpKernel {
     private $controller;
     private $arguments;
 
-    private $basePath;
+    private $basePath;*/
 
-    public static $instance = null;
+    //public static $instance = null;
 
     private $container = [];
     
-    public static function getInstance($path = null)
+    /*public static function getInstance($path = null)
     {
         if (is_null(static::$instance)) {
             static::$instance = new static($path);
         }
 
         return static::$instance;
-    }
+    }*/
     
     /*public function __construct($basePath)
     {
@@ -63,7 +63,7 @@ class App extends HttpKernel {
     protected $dispatcher;
     protected $argumentResolver;
 
-    public function __construct(ControllerResolverInterface $resolver, UrlMatcherInterface $matcher,ArgumentResolverInterface $argumentResolver)
+   /* public function __construct(ControllerResolverInterface $resolver, UrlMatcherInterface $matcher,ArgumentResolverInterface $argumentResolver)
     {
         //$this->dispatcher = $dispatcher;
         $this->matcher = $matcher;
@@ -71,9 +71,9 @@ class App extends HttpKernel {
         $this->argumentResolver = $argumentResolver;
 
         $this->request = $this->setRequest();
-    }
+    }*/
 
-    public function getBasePath() {
+   /* public function getBasePath() {
         return $this->basePath;
     }
 
@@ -99,7 +99,7 @@ class App extends HttpKernel {
     /**
      * @return Router
      */
-    private function setRouter() {
+   /* private function setRouter() {
         $fileLocator = new FileLocator(array(__DIR__));
         $router = new Router(
             new YamlFileLoader($fileLocator),
@@ -117,31 +117,15 @@ class App extends HttpKernel {
     public function getArguments($controller) {
         $argumentResolver = new HttpKernel\Controller\ArgumentResolver();
         return $argumentResolver->getArguments($this->request, $controller);
-    }
+    }**/
 
 
     public function run() {
-        
-        //$matcher = new Routing\Matcher\UrlMatcher($this->routes, $this->requestContext);
-
-        try {
-            $this->request->attributes->add($this->matcher->match($this->request->getPathInfo()));
-            
-            $controller = $this->resolver->getController($this->request);
-            $arguments =  $this->argumentResolver->getArguments($this->request, $controller);
-
-            $response = call_user_func_array($controller, $arguments);
-            
-        } catch (Routing\Exception\ResourceNotFoundException $exception) {
-            $response = new Response('Not Found', 404);
-        } catch (\Exception $exception) {
-            $response = new Response($exception->getMessage(), 500);
-        }
-
-        $response->send();
+        $this->handle(Request::createFromGlobals())->send();
+        return;
     }
 
-    public function add($key, $object) {
+    /*public function add($key, $object) {
         $this->container[$key] = $object;
         return $object;
     }
@@ -150,6 +134,6 @@ class App extends HttpKernel {
             return $this->container[$key];
         }
         return null;
-    }
+    }*/
 
 }
