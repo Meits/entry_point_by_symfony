@@ -1,62 +1,67 @@
 <?php
 
 namespace App\System;
-use Symfony\Component\HttpKernel\Controller\ArgumentResolverInterface;
-use Symfony\Component\HttpKernel\Controller\ControllerResolverInterface;
-use Symfony\Component\HttpKernel\HttpKernel;
-use Symfony\Component\Routing\Matcher\UrlMatcherInterface;
-use Symfony\Component\Routing\RequestContext;
-use Symfony\Component\Routing\Router;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Generator\UrlGenerator;
+
 use Symfony\Component\Config\FileLocator;
-use Symfony\Component\Routing\Loader\YamlFileLoader;
-use Symfony\Component\Routing\Exception\ResourceNotFoundException;
-use Symfony\Component\HttpKernel\Controller;
-use Symfony\Component\Routing\RouteCollection;
-
+use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\DependencyInjection;
+use Symfony\Component\HttpFoundation;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel;
 use Symfony\Component\Routing;
+use Symfony\Component\EventDispatcher;
+use Symfony\Component\Routing\Loader\YamlFileLoader;
+use Symfony\Component\Routing\Router;
 
 
-class App extends HttpKernel {
+class App {
 
-   /* private $request;
-    public $router;
-    public $routes;
-    private $requestContext;
-    
-    private $controller;
-    private $arguments;
 
-    private $basePath;*/
+    private $basePath;
+    private $containerBuilder;
+    private $routes;
+    private $request;
 
-    //public static $instance = null;
+    public static $instance = null;
 
-    private $container = [];
-    
-    /*public static function getInstance($path = null)
+    public static function getInstance($path = null)
     {
         if (is_null(static::$instance)) {
             static::$instance = new static($path);
         }
 
         return static::$instance;
-    }*/
-    
-    /*public function __construct($basePath)
+    }
+
+    private function __construct($basePath)
     {
-        $this->request = $this->setRequest();
-
-        $this->requestContext = $this->setRequestContext();
-
-        $this->router = $this->setRouter();
-
-        $this->routes = $this->router->getRouteCollection();
-
+        $this->setRequest();
+        $this->setRoutes();
+        $this->setContainerBuilder();
         $this->basePath = $basePath;
+    }
 
-    }*/
+    /**
+     * @return mixed
+     */
+    public function getContainerBuilder()
+    {
+        return $this->containerBuilder;
+    }
+
+    public function setRequest() {
+        $this->request = Request::createFromGlobals();
+    }
+
+    private function setRoutes() {
+        $fileLocator = new FileLocator(array(__DIR__));
+        $router = new Router(
+            new YamlFileLoader($fileLocator),
+            BASEPATH.'/config/routes.yaml',
+            array('cache_dir' => BASEPATH.'/storage/cache')
+        );
+        $this->routes = $router->getRouteCollection();
+    }
 
     protected $matcher;
     protected $resolver;
@@ -121,8 +126,46 @@ class App extends HttpKernel {
 
 
     public function run() {
-        $this->handle(Request::createFromGlobals())->send();
-        return;
+        $kernel = $this->containerBuilder->get('kernel');
+        $kernel->handle($this->request)->send();
+    }
+
+    private function setContainerBuilder()
+    {
+        $containerBuilder = new DependencyInjection\ContainerBuilder();
+        $containerBuilder->register('context', Routing\RequestContext::class);
+        $containerBuilder->register('matcher', Routing\Matcher\UrlMatcher::class)
+            ->setArguments([$this->routes, new Reference('context')])
+        ;
+        $containerBuilder->register('request_stack', HttpFoundation\RequestStack::class);
+        $containerBuilder->register('controller_resolver', HttpKernel\Controller\ControllerResolver::class);
+        $containerBuilder->register('argument_resolver', HttpKernel\Controller\ArgumentResolver::class);
+
+        $containerBuilder->register('listener.router', HttpKernel\EventListener\RouterListener::class)
+            ->setArguments([new Reference('matcher'), new Reference('request_stack')])
+        ;
+        $containerBuilder->register('listener.response', HttpKernel\EventListener\ResponseListener::class)
+            ->setArguments(['UTF-8'])
+        ;
+        $containerBuilder->register('listener.exception', HttpKernel\EventListener\ExceptionListener::class)
+            ->setArguments(['Calendar\Controller\ErrorController::exception'])
+        ;
+        $containerBuilder->register('dispatcher', EventDispatcher\EventDispatcher::class)
+            ->addMethodCall('addSubscriber', [new Reference('listener.router')])
+            ->addMethodCall('addSubscriber', [new Reference('listener.response')])
+            ->addMethodCall('addSubscriber', [new Reference('listener.exception')])
+        ;
+
+        $containerBuilder->register('kernel',  Kernel::class)
+            ->setArguments([
+                new Reference('dispatcher'),
+                new Reference('controller_resolver'),
+                new Reference('request_stack'),
+                new Reference('argument_resolver'),
+            ])
+        ;
+
+        $this->containerBuilder = $containerBuilder;
     }
 
     /*public function add($key, $object) {
@@ -135,5 +178,9 @@ class App extends HttpKernel {
         }
         return null;
     }*/
+
+    public function get($key) {
+        return $this->containerBuilder->get($key);
+    }
 
 }

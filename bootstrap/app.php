@@ -9,7 +9,7 @@ use Symfony\Component\HttpKernel;
 use Symfony\Component\Routing;
 use Symfony\Component\EventDispatcher;
 
-
+/*
 $routes = include("routing.php");
 
 $containerBuilder = new DependencyInjection\ContainerBuilder();
@@ -46,10 +46,27 @@ $containerBuilder->register('framework',  App\System\App::class)
 ;
 
 return $containerBuilder->get('framework');
+*/
 
 
+$app = App\System\App::getInstance(BASEPATH);
+
+$app->getContainerBuilder()->register('config', \App\System\Config\Config::class)
+    ->setArguments(['config'])
+;
+$app->get('config')->addConfig('routes.yaml');
+$app->get('config')->addConfig('app.yaml');
+$app->get('config')->addConfig('database.yaml');
+
+if(config('system.orm') == true) {
+    $app->getContainerBuilder()->register('orm', \App\System\Database\Orm::class)
+        ->setArguments([config('database')])
+    ;
+}
+
+
+return $app;
 /*
- $app = App\System\App::getInstance(BASEPATH);
 $config = new \App\System\Config\Config('config');
 $config->addConfig('routes.yaml');
 $config->addConfig('app.yaml');

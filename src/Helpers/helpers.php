@@ -13,7 +13,7 @@ if (! function_exists('config')) {
 
     function config($keyValue)
     {
-        $config = app()->get('config');
+        $config = app()->getContainerBuilder()->get('config');
         return $config->get($keyValue);
     }
 }

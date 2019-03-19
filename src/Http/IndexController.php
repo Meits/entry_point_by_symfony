@@ -10,6 +10,8 @@ namespace App\Http;
 
 
 use App\Entities\Book;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Routing\RequestContext;
 
 class IndexController extends Controller
 {
@@ -20,9 +22,10 @@ class IndexController extends Controller
         parent::__construct();
     }
 
-    public function indexAction() {
+    public function indexAction(Request $request) {
 
         //$em = app()->get('orm')->getEntityManager();
+        //dd($em);
         return $this->render("index",['title' => "kuuuu"]);
     }
 }
