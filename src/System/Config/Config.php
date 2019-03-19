@@ -64,6 +64,14 @@ class Config
         }
     }
 
+    public function addConfigs($configs) {
+        if(is_array($configs)) {
+            foreach ($configs as $config) {
+                $this->addConfig($config);
+            }
+        }
+    }
+
 
     public function get($keyValue) {
         if(strpos($keyValue,".")) {

@@ -22,6 +22,11 @@ class App {
     private $routes;
     private $request;
 
+    protected $matcher;
+    protected $resolver;
+    protected $dispatcher;
+    protected $argumentResolver;
+
     public static $instance = null;
 
     public static function getInstance($path = null)
@@ -62,68 +67,6 @@ class App {
         );
         $this->routes = $router->getRouteCollection();
     }
-
-    protected $matcher;
-    protected $resolver;
-    protected $dispatcher;
-    protected $argumentResolver;
-
-   /* public function __construct(ControllerResolverInterface $resolver, UrlMatcherInterface $matcher,ArgumentResolverInterface $argumentResolver)
-    {
-        //$this->dispatcher = $dispatcher;
-        $this->matcher = $matcher;
-        $this->resolver = $resolver;
-        $this->argumentResolver = $argumentResolver;
-
-        $this->request = $this->setRequest();
-    }*/
-
-   /* public function getBasePath() {
-        return $this->basePath;
-    }
-
-    public function setRequest() {
-        return Request::createFromGlobals();
-    }
-
-    public function getRequest() {
-        return $this->request;
-    }
-
-    public function setRequestContext() {
-        $requestContext = new RequestContext();
-        $requestContext->fromRequest($this->request);
-
-        return $requestContext;
-    }
-
-    public function getRequestContextt() {
-        return $this->requestContext;
-    }
-
-    /**
-     * @return Router
-     */
-   /* private function setRouter() {
-        $fileLocator = new FileLocator(array(__DIR__));
-        $router = new Router(
-            new YamlFileLoader($fileLocator),
-            BASEPATH.'/config/routes.yaml',
-            array('cache_dir' => BASEPATH.'/storage/cache')
-        );
-        return $router;
-    }
-
-    public function getController() {
-        $controllerResolver = new HttpKernel\Controller\ControllerResolver();
-        return $controllerResolver->getController($this->request);
-    }
-
-    public function getArguments($controller) {
-        $argumentResolver = new HttpKernel\Controller\ArgumentResolver();
-        return $argumentResolver->getArguments($this->request, $controller);
-    }**/
-
 
     public function run() {
         $kernel = $this->containerBuilder->get('kernel');
@@ -168,19 +111,7 @@ class App {
         $this->containerBuilder = $containerBuilder;
     }
 
-    /*public function add($key, $object) {
-        $this->container[$key] = $object;
-        return $object;
-    }
-    public function get($key) {
-        if(isset($this->container[$key])) {
-            return $this->container[$key];
-        }
-        return null;
-    }*/
-
     public function get($key) {
         return $this->containerBuilder->get($key);
     }
-
 }
