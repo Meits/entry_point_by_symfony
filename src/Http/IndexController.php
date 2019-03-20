@@ -26,6 +26,6 @@ class IndexController extends Controller
 
         //$em = app()->get('orm')->getEntityManager();
         //dd($em);
-        return $this->render("index",['title' => "kuuuu"]);
+        return $this->render("index.html.twig",['title' => "kuuuu"]);
     }
 }

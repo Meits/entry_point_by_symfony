@@ -91,7 +91,7 @@ class App {
             ->setArguments(['UTF-8'])
         ;
         $containerBuilder->register('listener.exception', HttpKernel\EventListener\ExceptionListener::class)
-            ->setArguments(['Calendar\Controller\ErrorController::exception'])
+            ->setArguments(['App\Http\IndexController::indexAction'])
         ;
         $containerBuilder->register('dispatcher', EventDispatcher\EventDispatcher::class)
             ->addMethodCall('addSubscriber', [new Reference('listener.router')])
