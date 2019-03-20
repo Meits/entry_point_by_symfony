@@ -9,6 +9,7 @@
 namespace App\Http;
 
 
+use App\System\App;
 use App\System\View\View;
 use Symfony\Component\HttpFoundation\Response;
 use App\System\Controller\IController;
@@ -16,9 +17,11 @@ use App\System\Controller\IController;
 class Controller implements IController
 {
     protected $view;
+    protected $container;
 
     public function __construct() {
-        $this->view = new View();
+        $this->container = app();
+        $this->view = $this->container->get('view');
     }
 
     public function render($path, $data = []) {

@@ -9,6 +9,7 @@
 namespace App\System\View;
 
 use Symfony\Bridge\Twig\TwigEngine;
+use Symfony\Component\Templating\EngineInterface;
 use Symfony\Component\Templating\PhpEngine;
 use Symfony\Component\Templating\TemplateNameParser;
 use Symfony\Component\Templating\Loader\FilesystemLoader;
@@ -23,11 +24,9 @@ class View implements IView
     /**
      * View constructor.
      */
-    public function __construct()
+    public function __construct(EngineInterface $templating)
     {
-        //$filesystemLoader = new FilesystemLoader(BASEPATH.'/resources/views/%name%.php');
-        //$this->templating = new PhpEngine(new TemplateNameParser(), $filesystemLoader);
-        $this->templating = new TwigEngine(new Environment(new \Twig\Loader\FilesystemLoader([BASEPATH.'/resources/views/'])),new TemplateNameParser());
+        $this->templating = $templating;
     }
 
     public function make($path, $data = []) {

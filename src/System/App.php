@@ -69,7 +69,7 @@ class App {
     }
 
     public function run() {
-        $kernel = $this->containerBuilder->get('kernel');
+        $kernel = $this->get('kernel');
         $kernel->handle($this->request)->send();
     }
 

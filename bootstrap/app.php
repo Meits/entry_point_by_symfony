@@ -1,5 +1,8 @@
 <?php
 
+use Symfony\Component\Templating\TemplateNameParser;
+use Twig\Environment;
+
 define('BASEPATH', dirname(__DIR__));
 
 $app = App\System\App::getInstance(BASEPATH);
@@ -18,5 +21,9 @@ if(config('app.orm') == true) {
         ->setArguments([config('database')])
     ;
 }
+
+$app->getContainerBuilder()->register('view', \App\System\View\View::class)
+    ->setArguments([ new \Symfony\Bridge\Twig\TwigEngine(new Environment(new \Twig\Loader\FilesystemLoader([BASEPATH.'/resources/views/'])),new TemplateNameParser())])
+;
 
 return $app;
