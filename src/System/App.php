@@ -3,6 +3,7 @@
 namespace App\System;
 
 use Symfony\Component\Config\FileLocator;
+use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection;
 use Symfony\Component\HttpFoundation;
@@ -21,6 +22,7 @@ class App {
     private $containerBuilder;
     private $routes;
     private $request;
+    private $response;
 
     protected $matcher;
     protected $resolver;
@@ -70,12 +72,17 @@ class App {
 
     public function run() {
         $kernel = $this->get('kernel');
-        $kernel->handle($this->request)->send();
+        $this->response = $kernel->handle($this->request);
+        $this->response->send();
+        $kernel->terminate($this->request, $this->response);
     }
 
     private function setContainerBuilder()
     {
         $containerBuilder = new DependencyInjection\ContainerBuilder();
+        $loader = new DependencyInjection\Loader\YamlFileLoader($containerBuilder, new FileLocator(__DIR__));
+        $loader->load(BASEPATH.'/config/services.yaml');
+//dd($containerBuilder);
         $containerBuilder->register('context', Routing\RequestContext::class);
         $containerBuilder->register('matcher', Routing\Matcher\UrlMatcher::class)
             ->setArguments([$this->routes, new Reference('context')])
@@ -107,6 +114,7 @@ class App {
                 new Reference('argument_resolver'),
             ])
         ;
+
 
         $this->containerBuilder = $containerBuilder;
     }
