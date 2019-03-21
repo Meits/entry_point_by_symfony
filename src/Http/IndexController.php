@@ -10,22 +10,23 @@ namespace App\Http;
 
 
 use App\Entities\Book;
+use Symfony\Bridge\Twig\TwigEngine;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\RequestContext;
+use Symfony\Component\Routing\Annotation\Route;
 
 class IndexController extends Controller
 {
 
-
-    public function __construct()
-    {
-        parent::__construct();
-    }
-
+    /**
+     * Matches /blog exactly
+     *
+     * @Route("/", name="home")
+     */
     public function indexAction(Request $request) {
 
         //$em = app()->get('orm')->getEntityManager();
-        //dd($em);
         return $this->render("index.html.twig",['title' => "kuuuu"]);
     }
 }
