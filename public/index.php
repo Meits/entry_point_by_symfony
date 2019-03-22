@@ -12,8 +12,8 @@ require "../vendor/autoload.php";
 $app = require_once __DIR__.'/../bootstrap/app.php';
 $app->run();
 
-
-/*use Doctrine\Common\Annotations\AnnotationRegistry;
+/*
+use Doctrine\Common\Annotations\AnnotationRegistry;
 use Symfony\Component\HttpFoundation\Request;
 
 define('BASEPATH', dirname(__DIR__));
