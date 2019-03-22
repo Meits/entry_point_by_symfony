@@ -83,6 +83,7 @@ class App {
         $loader = new DependencyInjection\Loader\YamlFileLoader($containerBuilder, new FileLocator(__DIR__));
         $loader->load(BASEPATH.'/config/services.yaml');
 //dd($containerBuilder);
+//dd($containerBuilder->get('App\Http\IndexController'));
         $containerBuilder->register('context', Routing\RequestContext::class);
         $containerBuilder->register('matcher', Routing\Matcher\UrlMatcher::class)
             ->setArguments([$this->routes, new Reference('context')])
