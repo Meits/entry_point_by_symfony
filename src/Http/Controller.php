@@ -23,7 +23,7 @@ class Controller implements IController
     protected $container;
 
     public function __construct(IView $view) {
-        dump($view);
+        //dump($view);
         if(!$view) {
             //$this->container = app();
             //$view = $this->container->get('App\System\View\IView');

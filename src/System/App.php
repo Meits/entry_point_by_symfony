@@ -72,7 +72,7 @@ class App {
 
     public function run() {
         $this->containerBuilder->compile();
-        dump($this->containerBuilder);
+
         $kernel = $this->get('kernel');
         $this->response = $kernel->handle($this->request);
         $this->response->send();
@@ -86,45 +86,45 @@ class App {
         $loader->load(BASEPATH.'/config/services.yaml');
 //dd($containerBuilder);
 //dd($containerBuilder->get('App\Http\IndexController'));
-        $containerBuilder->register('context', Routing\RequestContext::class);
-        $containerBuilder->register('matcher', Routing\Matcher\UrlMatcher::class)
-            ->setArguments([$this->routes, new Reference('context')])
+        $containerBuilder->register('context', Routing\RequestContext::class)->setPublic(true);
+        $containerBuilder->register('matcher', Routing\Matcher\UrlMatcher::class)->setPublic(true)
+            ->setArguments([$this->routes, new Reference('context')])->setPublic(true)
         ;
-        $containerBuilder->register('request_stack', HttpFoundation\RequestStack::class);
-        $containerBuilder->register('controller_resolver', HttpKernel\Controller\ControllerResolver::class);
-        $containerBuilder->register('argument_resolver', HttpKernel\Controller\ArgumentResolver::class);
+        $containerBuilder->register('request_stack', HttpFoundation\RequestStack::class)->setPublic(true);
+        $containerBuilder->register('controller_resolver', HttpKernel\Controller\ControllerResolver::class)->setPublic(true);
+        $containerBuilder->register('argument_resolver', HttpKernel\Controller\ArgumentResolver::class)->setPublic(true);
 
         $containerBuilder->register('listener.router', HttpKernel\EventListener\RouterListener::class)
-            ->setArguments([new Reference('matcher'), new Reference('request_stack')])
+            ->setArguments([new Reference('matcher'), new Reference('request_stack')])->setPublic(true)
         ;
         $containerBuilder->register('listener.response', HttpKernel\EventListener\ResponseListener::class)
             ->setArguments(['UTF-8'])
         ;
         $containerBuilder->register('listener.exception', HttpKernel\EventListener\ExceptionListener::class)
-            ->setArguments(['App\Http\IndexController::indexAction'])
+            ->setArguments(['App\Http\IndexController::indexAction'])->setPublic(true)
         ;
         $containerBuilder->register('dispatcher', EventDispatcher\EventDispatcher::class)
             ->addMethodCall('addSubscriber', [new Reference('listener.router')])
             ->addMethodCall('addSubscriber', [new Reference('listener.response')])
-            ->addMethodCall('addSubscriber', [new Reference('listener.exception')])
+            ->addMethodCall('addSubscriber', [new Reference('listener.exception')])->setPublic(true)
         ;
 
         $containerBuilder->registerForAutoconfiguration(Command::class)
-            ->addTag('console.command');
+            ->addTag('console.command')->setPublic(true);
         $containerBuilder->registerForAutoconfiguration(ResourceCheckerInterface::class)
-            ->addTag('config_cache.resource_checker');
+            ->addTag('config_cache.resource_checker')->setPublic(true);
         $containerBuilder->registerForAutoconfiguration(EnvVarProcessorInterface::class)
-            ->addTag('container.env_var_processor');
+            ->addTag('container.env_var_processor')->setPublic(true);
         $containerBuilder->registerForAutoconfiguration(ServiceLocator::class)
-            ->addTag('container.service_locator');
+            ->addTag('container.service_locator')->setPublic(true);
         $containerBuilder->registerForAutoconfiguration(ServiceSubscriberInterface::class)
-            ->addTag('container.service_subscriber');
+            ->addTag('container.service_subscriber')->setPublic(true);
         $containerBuilder->registerForAutoconfiguration(ArgumentValueResolverInterface::class)
-            ->addTag('controller.argument_value_resolver');
+            ->addTag('controller.argument_value_resolver')->setPublic(true);
         $containerBuilder->registerForAutoconfiguration(AbstractController::class)
-            ->addTag('controller.service_arguments');
+            ->addTag('controller.service_arguments')->setPublic(true);
         $containerBuilder->registerForAutoconfiguration('Symfony\Bundle\FrameworkBundle\Controller\Controller')
-            ->addTag('controller.service_arguments');
+            ->addTag('controller.service_arguments')->setPublic(true);
 
         $containerBuilder->register('kernel',  Kernel::class)
             ->setArguments([
