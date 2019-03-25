@@ -31,30 +31,31 @@ class SimpleKernel extends BaseKernel
     {
         $bundles = [
             new \Symfony\Bundle\FrameworkBundle\FrameworkBundle(),
-            //new \Symfony\Bundle\TwigBundle\TwigBundle(),
+            new \Symfony\Bundle\TwigBundle\TwigBundle(),
         ];
 
 
-       /* if ($this->getEnvironment() == 'dev') {
+        if ($this->getEnvironment() == 'dev') {
             $bundles[] = new WebProfilerBundle();
-        }*/
+        }
 
         return $bundles;
     }
 
     protected function configureContainer(ContainerBuilder $c, LoaderInterface $loader)
     {
+
         $loader->load(BASEPATH.'/config/framework.yaml');
         $loader->load(BASEPATH.'/config/services.yaml');
 
 
         // configure WebProfilerBundle only if the bundle is enabled
-       /* if (isset($this->bundles['WebProfilerBundle'])) {
+        if (isset($this->bundles['WebProfilerBundle'])) {
             $c->loadFromExtension('web_profiler', [
                 'toolbar' => true,
                 'intercept_redirects' => false,
             ]);
-        }*/
+        }
 
         //$c->register('filesystemLoader',\Twig\Loader\FilesystemLoader::class)->setArguments([[BASEPATH.'/resources/views/']]);
         //$c->register('environment',Environment::class)->setArguments([new Reference('filesystemLoader')]);
@@ -66,6 +67,8 @@ class SimpleKernel extends BaseKernel
         ;*/
         //$c->setAlias(IView::class, 'view');
 
+        ///dd($c);
+
 
 
     }
@@ -73,10 +76,10 @@ class SimpleKernel extends BaseKernel
     protected function configureRoutes(RouteCollectionBuilder $routes)
     {
         // import the WebProfilerRoutes, only if the bundle is enabled
-        /*if (isset($this->bundles['WebProfilerBundle'])) {
+        if (isset($this->bundles['WebProfilerBundle'])) {
             $routes->import('@WebProfilerBundle/Resources/config/routing/wdt.xml', '/_wdt');
             $routes->import('@WebProfilerBundle/Resources/config/routing/profiler.xml', '/_profiler');
-        }*/
+        }
 
         // load the annotation routes
         //$routes->import(BASEPATH.'/src/Http/', '/', 'annotation');

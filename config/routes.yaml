@@ -1,7 +1,7 @@
 index_route:
     path: /
-    defaults: { _controller: 'App\Http\IndexController::indexAction' }
+    defaults: { _controller: '\App\Http\IndexController::indexAction' }
 
 page_route:
     path: /page/{alias}
-    defaults: { _controller: 'App\Http\PageController::show' }
+    defaults: { _controller: '\App\Http\PageController::show' }

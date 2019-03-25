@@ -23,6 +23,7 @@ class IndexController extends Controller
      * Matches /blog exactly
      *
      * @Route("/", name="home")
+     *
      */
     public function indexAction(Request $request) {
 

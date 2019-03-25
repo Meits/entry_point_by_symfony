@@ -7,7 +7,19 @@ define('BASEPATH', dirname(__DIR__));
 
 $app = App\System\App::getInstance(BASEPATH);
 
-$app->getContainerBuilder()->register('config', \App\System\Config\Config::class)
+/*$container = \App\System\NewApp::buildContainer(BASEPATH);
+
+$response = $container->get('response');
+$response->send();
+
+dd($container);*/
+
+
+
+
+
+
+/*$app->getContainerBuilder()->register('config', \App\System\Config\Config::class)
     ->setArguments(['config'])
 ;
 $app->get('config')->addConfigs([
@@ -20,10 +32,11 @@ if(config('app.orm') == true) {
     $app->getContainerBuilder()->register('orm', \App\System\Database\Orm::class)
         ->setArguments([config('database')])
     ;
-}
+}*/
 
-$app->getContainerBuilder()->register('view', \App\System\View\View::class)
+/*$app->getContainerBuilder()->register('view', \App\System\View\View::class)
     ->setArguments([ new \Symfony\Bridge\Twig\TwigEngine(new Environment(new \Twig\Loader\FilesystemLoader([BASEPATH.'/resources/views/'])),new TemplateNameParser())])
-;
+;*/
+
 
 return $app;

@@ -1,0 +1,38 @@
+imports:
+  - { resource: 'routes.yaml' }
+services:
+  dispatcher:
+    class: Symfony\Component\EventDispatcher\EventDispatcher
+  request:
+      class: Symfony\Component\HttpFoundation\Request
+      factory: [ Symfony\Component\HttpFoundation\Request, createFromGlobals ]
+  request_stack:
+    class: Symfony\Component\HttpFoundation\RequestStack
+  resolver:
+    class: Symfony\Component\HttpKernel\Controller\ControllerResolver
+  http_kernel:
+    class: Symfony\Component\HttpKernel\HttpKernel
+    arguments: ["@dispatcher", "@resolver", "@request_stack"]
+  response:
+    class: Symfony\Component\HttpFoundation\Response
+    factory: [ "@http_kernel", handle]
+    arguments: ["@request"]
+    public: true
+  route.collection:
+    class: Symfony\Component\Routing\RouteCollection
+    calls:
+      - [ add, ["index_route", "@index_route"] ]
+      - [ add, ["page_route", "@page_route"] ]
+  router.request_context:
+      class: Symfony\Component\Routing\RequestContext
+      calls:
+        - [ fromRequest, ["@request"] ]
+  router.matcher:
+    class: Symfony\Component\Routing\Matcher\UrlMatcher
+    arguments: [ "@route.collection", "@router.request_context" ]
+  router.listener:
+    class: Symfony\Component\HttpKernel\EventListener\RouterListener
+    arguments:
+      matcher: "@router.matcher"
+      request_stack: "@request_stack"
+      context: "@router.request_context"

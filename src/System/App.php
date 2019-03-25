@@ -71,6 +71,8 @@ class App {
     }
 
     public function run() {
+        $this->containerBuilder->compile();
+        dump($this->containerBuilder);
         $kernel = $this->get('kernel');
         $this->response = $kernel->handle($this->request);
         $this->response->send();
@@ -107,13 +109,30 @@ class App {
             ->addMethodCall('addSubscriber', [new Reference('listener.exception')])
         ;
 
+        $containerBuilder->registerForAutoconfiguration(Command::class)
+            ->addTag('console.command');
+        $containerBuilder->registerForAutoconfiguration(ResourceCheckerInterface::class)
+            ->addTag('config_cache.resource_checker');
+        $containerBuilder->registerForAutoconfiguration(EnvVarProcessorInterface::class)
+            ->addTag('container.env_var_processor');
+        $containerBuilder->registerForAutoconfiguration(ServiceLocator::class)
+            ->addTag('container.service_locator');
+        $containerBuilder->registerForAutoconfiguration(ServiceSubscriberInterface::class)
+            ->addTag('container.service_subscriber');
+        $containerBuilder->registerForAutoconfiguration(ArgumentValueResolverInterface::class)
+            ->addTag('controller.argument_value_resolver');
+        $containerBuilder->registerForAutoconfiguration(AbstractController::class)
+            ->addTag('controller.service_arguments');
+        $containerBuilder->registerForAutoconfiguration('Symfony\Bundle\FrameworkBundle\Controller\Controller')
+            ->addTag('controller.service_arguments');
+
         $containerBuilder->register('kernel',  Kernel::class)
             ->setArguments([
                 new Reference('dispatcher'),
                 new Reference('controller_resolver'),
                 new Reference('request_stack'),
                 new Reference('argument_resolver'),
-            ])
+            ])->setPublic(true)
         ;
 
 
