@@ -17,7 +17,7 @@ services:
     # this creates a service per class whose id is the fully-qualified class name
     App\:
         resource: '../src/*'
-        exclude: '../src/{Entities,Helpers,System,var,Migrations,Tests,Kernel.php}'
+        exclude: '../src/{Entities,Helpers,System,var}'
 
     # controllers are imported separately to make sure services can be injected
     # as action arguments even if you don't extend any base controller class
@@ -25,6 +25,7 @@ services:
         resource: '../src/Http'
         tags: ['controller.service_arguments']
         public: true
+
 
     filesystemLoader:
         class: \Twig\Loader\FilesystemLoader
@@ -38,11 +39,16 @@ services:
     twigEngine:
         class: \Symfony\Bridge\Twig\TwigEngine
         arguments: ['@environment','@templateNameParser']
-
-
     App\System\View\IView:
         class: \App\System\View\View
         arguments: ['@twigEngine']
+        public: true
+
+    Config:
+        class: \App\System\Config\Config
+        arguments: ['config']
+        calls:
+          - [ addConfigs, ["database.yaml", "app.yaml"] ]
         public: true
 
 
