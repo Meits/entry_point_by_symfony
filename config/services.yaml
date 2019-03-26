@@ -44,11 +44,15 @@ services:
         arguments: ['@twigEngine']
         public: true
 
-    Config:
+    App\System\Config\IConfig:
         class: \App\System\Config\Config
         arguments: ['config']
         calls:
-          - [ addConfigs, ["database.yaml", "app.yaml"] ]
+          - [ addConfigs, [["database.yaml", "app.yaml"]] ]
+        public: true
+
+    App\System\Database\Orm:
+        class: \App\System\Database\Orm
         public: true
 
 

@@ -21,17 +21,8 @@ class Orm
      * Orm constructor.
      * @param $params
      */
-    public function __construct($params)
+    public function __construct()
     {
-        $this->params = $params;
-
-        $isDevMode = true;
-
-        $config = Setup::createAnnotationMetadataConfiguration(array("src/Entities"), $isDevMode);
-//$config = Setup::createXMLMetadataConfiguration(array("config/xml"), $isDevMode);
-//$config = Setup::createYAMLMetadataConfiguration(array("config/yml"), $isDevMode);
-
-        $this->setEntityManager(EntityManager::create($this->params,$config));
     }
 
     /**
@@ -45,9 +36,14 @@ class Orm
     /**
      * @param EntityManager $entityManager
      */
-    public function setEntityManager($entityManager)
+    public function setEntityManager($params, $pathEntities = array("src/Entities"), $isDevMode = 'dev')
     {
-        $this->entityManager = $entityManager;
+
+        $config = Setup::createAnnotationMetadataConfiguration($pathEntities, $isDevMode);
+        //$config = Setup::createXMLMetadataConfiguration(array("config/xml"), $isDevMode);
+        //$config = Setup::createYAMLMetadataConfiguration(array("config/yml"), $isDevMode);
+
+        $this->entityManager = EntityManager::create($params,$config);
     }
 
 

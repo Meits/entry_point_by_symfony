@@ -12,7 +12,7 @@ namespace App\System\Config;
 use Symfony\Component\Config\Definition\Processor;
 use Symfony\Component\Config\FileLocator;
 
-class Config
+class Config implements IConfig
 {
 
     private $loader;
