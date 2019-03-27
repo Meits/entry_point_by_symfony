@@ -38,11 +38,7 @@ class Orm
      */
     public function setEntityManager($params, $pathEntities = array("src/Entities"), $isDevMode = 'dev')
     {
-
         $config = Setup::createAnnotationMetadataConfiguration($pathEntities, $isDevMode);
-        //$config = Setup::createXMLMetadataConfiguration(array("config/xml"), $isDevMode);
-        //$config = Setup::createYAMLMetadataConfiguration(array("config/yml"), $isDevMode);
-
         $this->entityManager = EntityManager::create($params,$config);
     }
 

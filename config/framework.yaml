@@ -1,4 +1,0 @@
-# config/framework.yaml
-framework:
-    secret: sdasdasdasdas as das das
-    profiler: { only_exceptions: true }
