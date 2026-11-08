@@ -1,30 +1,36 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: MeitsWorkPc
- * Date: 11.03.2019
- * Time: 11:32
- */
+
+declare(strict_types=1);
 
 namespace App\Entities;
 
-/**
- * @Entity(repositoryClass="\Repositories\BookRepository")
- * @Table(name="books")
- */
+use App\Repository\BookRepository;
+use Doctrine\ORM\Mapping as ORM;
+
+#[ORM\Entity(repositoryClass: BookRepository::class)]
+#[ORM\Table(name: 'books')]
 class Book
 {
-    /**
-     * @id
-     * @Column(type="integer")
-     * @GeneratedValue
-     */
-    public $id;
+    #[ORM\Id]
+    #[ORM\Column(type: 'integer')]
+    #[ORM\GeneratedValue]
+    private ?int $id = null;
 
-    /**
-     * @Column(type="string", name="title_book", length=32, unique=true, nullable=true)
-     * @GeneratedValue
-     */
-    public $title;
+    #[ORM\Column(name: 'title_book', type: 'string', length: 191, unique: true)]
+    private string $title;
 
+    public function __construct(string $title)
+    {
+        $this->title = $title;
+    }
+
+    public function getId(): ?int
+    {
+        return $this->id;
+    }
+
+    public function getTitle(): string
+    {
+        return $this->title;
+    }
 }

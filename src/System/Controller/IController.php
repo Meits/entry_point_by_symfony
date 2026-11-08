@@ -1,8 +1,15 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\System\Controller;
 
-interface IController 
+use Symfony\Component\HttpFoundation\Response;
+
+interface IController
 {
-    public function render($path, $data = []);
+    /**
+     * @param array<string, mixed> $data
+     */
+    public function render(string $path, array $data = []): Response;
 }

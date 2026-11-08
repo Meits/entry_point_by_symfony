@@ -1,20 +1,24 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: MeitsWorkPc
- * Date: 18.02.2019
- * Time: 23:17
- */
+
+declare(strict_types=1);
 
 namespace App\Http;
 
-
-use Symfony\Component\HttpFoundation\Request;
+use App\Entities\Book;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Attribute\Route;
 
-class PageController  extends Controller
+final class PageController extends Controller
 {
-    public function show(Request $request, $alias = 'ku') {
-        return $this->render("page",['alias' => $alias]);
+    #[Route('/page/{alias}', name: 'page', methods: ['GET'])]
+    public function show(string $alias = 'hello'): Response
+    {
+        /** @var Book[] $books */
+        $books = $this->entityManager()->getRepository(Book::class)->findAll();
+
+        return $this->render('page.html.twig', [
+            'alias' => $alias,
+            'books' => $books,
+        ]);
     }
 }

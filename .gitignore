@@ -1,3 +1,9 @@
-vendor
-storage
-node_modules
+/vendor/
+/var/cache/
+/var/*.sqlite
+/node_modules/
+/.idea/
+/.vscode/
+.env.local
+.DS_Store
+.phpunit.result.cache

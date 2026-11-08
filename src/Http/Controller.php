@@ -1,50 +1,33 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: MeitsWorkPc
- * Date: 19.02.2019
- * Time: 21:58
- */
+
+declare(strict_types=1);
 
 namespace App\Http;
 
-
-use App\System\App;
-use App\System\Config\IConfig;
+use App\System\Controller\IController;
 use App\System\Database\Orm;
 use App\System\View\IView;
-use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\DependencyInjection\TaggedContainerInterface;
+use Doctrine\ORM\EntityManager;
 use Symfony\Component\HttpFoundation\Response;
-use App\System\Controller\IController;
 
-
-class Controller implements IController
+abstract class Controller implements IController
 {
-    protected $view;
-    protected $config;
-    protected $orm;
-    private $entityManager;
+    public function __construct(
+        private readonly IView $view,
+        private readonly Orm $orm,
+    ) {
+    }
 
     /**
-     * @return \Doctrine\ORM\EntityManager
+     * @param array<string, mixed> $data
      */
-    public function getEntityManager()
+    public function render(string $path, array $data = []): Response
+    {
+        return new Response($this->view->make($path, $data));
+    }
+
+    protected function entityManager(): EntityManager
     {
         return $this->orm->getEntityManager();
-    }
-    protected $container;
-
-    public function __construct(IView $view, IConfig $config,Orm $orm) {
-        $this->view = $view;
-        $this->config = $config;
-        $this->orm = $orm;
-
-        $this->orm->setEntityManager($this->config->get('database'));
-    }
-
-    public function render($path, $data = []) {
-        return new Response($this->view->make($path, $data));
     }
 }

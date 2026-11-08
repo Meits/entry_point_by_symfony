@@ -1,6 +1,7 @@
 database:
-    dbname: "doctrine"
+    driver: "pdo_sqlite"
+    path: "var/database.sqlite"
+    dbname: "app"
     user: "root"
     password: ""
-    host: ""
-    driver: "pdo_mysql"
+    host: "127.0.0.1"

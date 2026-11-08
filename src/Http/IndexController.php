@@ -1,31 +1,17 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: MeitsWorkPc
- * Date: 18.02.2019
- * Time: 22:41
- */
+
+declare(strict_types=1);
 
 namespace App\Http;
 
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Attribute\Route;
 
-use App\Entities\Book;
-use Symfony\Bridge\Twig\TwigEngine;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Routing\RequestContext;
-use Symfony\Component\Routing\Annotation\Route;
-
-class IndexController extends Controller
+final class IndexController extends Controller
 {
-
-    /**
-     * Matches /blog exactly
-     *
-     * @Route("/", name="home")
-     *
-     */
-    public function indexAction(Request $request) {
-        return $this->render("index.html.twig",['title' => "kuuuu"]);
+    #[Route('/', name: 'home', methods: ['GET'])]
+    public function indexAction(): Response
+    {
+        return $this->render('index.html.twig', ['title' => 'Entry Point']);
     }
 }

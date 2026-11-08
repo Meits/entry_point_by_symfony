@@ -1,8 +1,7 @@
 <?php
 
+declare(strict_types=1);
 
-define('BASEPATH', dirname(__DIR__));
+use App\System\App;
 
-$app = App\System\App::getInstance(BASEPATH);
-
-return $app;
+return new App(\dirname(__DIR__));

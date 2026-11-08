@@ -1,16 +1,12 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: MeitsWorkPc
- * Date: 26.03.2019
- * Time: 22:06
- */
+
+declare(strict_types=1);
 
 namespace App\System\Config;
 
-
 interface IConfig
 {
-    public function get($keyValue);
-    public function addConfig($file);
+    public function get(string $key): mixed;
+
+    public function addConfig(string $file): void;
 }

@@ -1,134 +1,134 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\System;
 
+use App\Http\ErrorController;
+use App\System\Database\Orm;
+use App\System\Routing\AttributeRouteLoader;
 use Symfony\Component\Config\FileLocator;
-use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 use Symfony\Component\DependencyInjection\Reference;
-use Symfony\Component\DependencyInjection;
-use Symfony\Component\HttpFoundation;
+use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpKernel;
-use Symfony\Component\Routing;
-use Symfony\Component\EventDispatcher;
-use Symfony\Component\Routing\Loader\YamlFileLoader;
-use Symfony\Component\Routing\Router;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpKernel\Controller\ArgumentResolver;
+use Symfony\Component\HttpKernel\Controller\ContainerControllerResolver;
+use Symfony\Component\HttpKernel\EventListener\ErrorListener;
+use Symfony\Component\HttpKernel\EventListener\ResponseListener;
+use Symfony\Component\HttpKernel\EventListener\RouterListener;
+use Symfony\Component\HttpKernel\HttpKernel;
+use Symfony\Component\HttpKernel\HttpKernelInterface;
+use Symfony\Component\Routing\Loader\AttributeDirectoryLoader;
+use Symfony\Component\Routing\Matcher\UrlMatcher;
+use Symfony\Component\Routing\RequestContext;
+use Symfony\Component\Routing\RouteCollection;
 
+/**
+ * Boots the application: assembles the service container, wires the
+ * routing/exception/response kernel listeners and dispatches the request.
+ *
+ * This intentionally mirrors (a tiny slice of) what
+ * `symfony/framework-bundle` does under the hood, without pulling it in.
+ */
+final class App
+{
+    private readonly ContainerBuilder $container;
+    private bool $compiled = false;
 
-class App {
-
-
-    private $basePath;
-    private $containerBuilder;
-    private $routes;
-    private $request;
-    private $response;
-
-    protected $matcher;
-    protected $resolver;
-    protected $dispatcher;
-    protected $argumentResolver;
-
-    public static $instance = null;
-
-    public static function getInstance($path = null)
+    public function __construct(private readonly string $basePath)
     {
-        if (is_null(static::$instance)) {
-            static::$instance = new static($path);
-        }
-
-        return static::$instance;
-    }
-
-    private function __construct($basePath)
-    {
-        $this->setRequest();
-        $this->setRoutes();
-        $this->setContainerBuilder();
-        $this->basePath = $basePath;
+        $this->container = $this->buildContainer();
     }
 
     /**
-     * @return mixed
+     * Fetches a public service, compiling the container on first use.
+     * Useful for CLI scripts (see bin/init-db.php) that need a service
+     * without going through run()/handle().
      */
-    public function getContainerBuilder()
+    public function get(string $id): object
     {
-        return $this->containerBuilder;
+        if (!$this->compiled) {
+            $this->container->compile();
+            $this->compiled = true;
+        }
+
+        return $this->container->get($id);
     }
 
-    public function setRequest() {
-        $this->request = Request::createFromGlobals();
-    }
-
-    private function setRoutes() {
-        $fileLocator = new FileLocator(array(__DIR__));
-        $router = new Router(
-            new YamlFileLoader($fileLocator),
-            BASEPATH.'/config/routes.yaml',
-            array('cache_dir' => BASEPATH.'/storage/cache')
-        );
-        $this->routes = $router->getRouteCollection();
-    }
-
-    public function run() {
-
-        $this->compileContainer();
-        $kernel = $this->get('kernel');
-        $this->response = $kernel->handle($this->request);
-        $this->response->send();
-        $kernel->terminate($this->request, $this->response);
-    }
-
-    private function setContainerBuilder()
+    public function getOrm(): Orm
     {
-        $containerBuilder = new DependencyInjection\ContainerBuilder();
+        return $this->get(Orm::class);
+    }
 
-        $loader = new DependencyInjection\Loader\YamlFileLoader($containerBuilder, new FileLocator(__DIR__));
-        $loader->load(BASEPATH.'/config/services.yaml');
+    public function run(): void
+    {
+        /** @var HttpKernelInterface $kernel */
+        $kernel = $this->get('app.kernel');
 
-        $containerBuilder->register('context', Routing\RequestContext::class);
-        $containerBuilder->register('matcher', Routing\Matcher\UrlMatcher::class)
-            ->setArguments([$this->routes, new Reference('context')])
-        ;
-        $containerBuilder->register('request_stack', HttpFoundation\RequestStack::class);
-        $containerBuilder->register('controller_resolver', HttpKernel\Controller\ContainerControllerResolver::class)
-            ->setArguments([$containerBuilder]);
-        $containerBuilder->register('argument_resolver', HttpKernel\Controller\ArgumentResolver::class);
+        $request = Request::createFromGlobals();
+        $response = $kernel->handle($request);
+        $response->send();
 
-        $containerBuilder->register('listener.router', HttpKernel\EventListener\RouterListener::class)
-            ->setArguments([new Reference('matcher'), new Reference('request_stack')])
-        ;
-        $containerBuilder->register('listener.response', HttpKernel\EventListener\ResponseListener::class)
-            ->setArguments(['UTF-8'])
-        ;
-        $containerBuilder->register('listener.exception', HttpKernel\EventListener\ExceptionListener::class)
-            ->setArguments(['App\Http\IndexController::indexAction'])
-        ;
-        $containerBuilder->register('dispatcher', EventDispatcher\EventDispatcher::class)
-            ->addMethodCall('addSubscriber', [new Reference('listener.router')])
-            ->addMethodCall('addSubscriber', [new Reference('listener.response')])
-            ->addMethodCall('addSubscriber', [new Reference('listener.exception')])
-        ;
+        if ($kernel instanceof HttpKernel) {
+            $kernel->terminate($request, $response);
+        }
+    }
 
-        $containerBuilder->register('kernel',  Kernel::class)
+    private function buildContainer(): ContainerBuilder
+    {
+        $container = new ContainerBuilder();
+        $container->setParameter('kernel.project_dir', $this->basePath);
+
+        $loader = new YamlFileLoader($container, new FileLocator($this->basePath . '/config'));
+        $loader->load('services.yaml');
+
+        $container->register('app.request_context', RequestContext::class);
+
+        $container->register(UrlMatcher::class)
+            ->setArguments([$this->loadRoutes(), new Reference('app.request_context')]);
+
+        $container->register(RequestStack::class);
+
+        $container->register(ContainerControllerResolver::class)
+            ->setArguments([$container]);
+
+        $container->register(ArgumentResolver::class);
+
+        $container->register(RouterListener::class)
+            ->setArguments([new Reference(UrlMatcher::class), new Reference(RequestStack::class)]);
+
+        $container->register(ResponseListener::class)
+            ->setArguments(['UTF-8']);
+
+        $container->register(ErrorListener::class)
+            ->setArguments([ErrorController::class . '::show']);
+
+        $container->register(EventDispatcher::class)
+            ->addMethodCall('addSubscriber', [new Reference(RouterListener::class)])
+            ->addMethodCall('addSubscriber', [new Reference(ResponseListener::class)])
+            ->addMethodCall('addSubscriber', [new Reference(ErrorListener::class)]);
+
+        $container->register('app.kernel', HttpKernel::class)
             ->setArguments([
-                new Reference('dispatcher'),
-                new Reference('controller_resolver'),
-                new Reference('request_stack'),
-                new Reference('argument_resolver'),
-            ])->setPublic('true');
-        ;
+                new Reference(EventDispatcher::class),
+                new Reference(ContainerControllerResolver::class),
+                new Reference(RequestStack::class),
+                new Reference(ArgumentResolver::class),
+            ])
+            ->setPublic(true);
 
-
-        $this->containerBuilder = $containerBuilder;
+        return $container;
     }
 
-    public function get($key) {
-        return $this->containerBuilder->get($key);
-    }
-
-    private function compileContainer()
+    private function loadRoutes(): RouteCollection
     {
-        $this->containerBuilder->compile();
+        $fileLocator = new FileLocator([$this->basePath . '/src/Http']);
+        $classLoader = new AttributeRouteLoader();
+        $directoryLoader = new AttributeDirectoryLoader($fileLocator, $classLoader);
+
+        return $directoryLoader->load($this->basePath . '/src/Http', 'attribute');
     }
 }

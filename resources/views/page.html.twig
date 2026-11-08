@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0"/>
+    <title>Page: {{ alias }}</title>
+    <link href="/css/style.css" type="text/css" rel="stylesheet" media="screen,projection"/>
+</head>
+<body>
+    <div class="main-title">Page alias: {{ alias }}</div>
+
+    <h2>Books (Doctrine demo)</h2>
+    {% if books is empty %}
+        <p>No books yet &mdash; run <code>composer run db:init</code> to seed some.</p>
+    {% else %}
+        <ul>
+            {% for book in books %}
+                <li>{{ book.title }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+
+    <p><a href="/">&larr; Back</a></p>
+</body>
+</html>

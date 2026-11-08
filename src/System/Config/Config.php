@@ -1,94 +1,50 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: MeitsWorkPc
- * Date: 20.02.2019
- * Time: 22:07
- */
+
+declare(strict_types=1);
 
 namespace App\System\Config;
 
+use Symfony\Component\Yaml\Yaml;
 
-use Symfony\Component\Config\Definition\Processor;
-use Symfony\Component\Config\FileLocator;
-
-class Config implements IConfig
+final class Config implements IConfig
 {
-
-    private $loader;
-    private $locator;
-
-    private $config = [];
+    /** @var array<string, mixed> */
+    private array $values = [];
 
     /**
-     * @return mixed
+     * @param string[] $files YAML file names, relative to "<projectDir>/config".
      */
-    public function getConfig()
+    public function __construct(
+        private readonly string $projectDir,
+        array $files = [],
+    ) {
+        foreach ($files as $file) {
+            $this->addConfig($file);
+        }
+    }
+
+    public function addConfig(string $file): void
     {
-        return $this->config;
+        $path = $this->projectDir . '/config/' . $file;
+        $parsed = Yaml::parseFile($path);
+
+        if (\is_array($parsed)) {
+            $this->values = [...$this->values, ...$parsed];
+        }
     }
 
-    /**
-     * @param YamlConfigLoader $loader
-     */
-    public function setLoader($locator)
+    public function get(string $key): mixed
     {
-        $this->loader =  new YamlConfigLoader($locator);
-    }
+        [$section, $field] = \array_pad(\explode('.', $key, 2), 2, null);
 
-    /**
-     * @param FileLocator $locator
-     */
-    public function setLocator($directories)
-    {
-        $this->locator =  new FileLocator($directories);
-    }
-    /**
-     * Config constructor.
-     */
-    public function __construct($dir)
-    {
-        $directories = array(BASEPATH.'/'.$dir);
-
-        $this->setLocator($directories);
-        $this->setLoader($this->locator);
-    }
-
-
-    public function addConfig($file) {
-        $configValues = $this->loader->load($this->locator->locate($file));
-        if($configValues) {
-            foreach ($configValues as $key => $arr) {
-                $this->config[$key] = $arr;
-            }
-        }
-    }
-
-    public function addConfigs($configs) {
-        if(is_array($configs)) {
-            foreach ($configs as $config) {
-                $this->addConfig($config);
-            }
-        }
-    }
-
-
-    public function get($keyValue) {
-        if(strpos($keyValue,".")) {
-            list($key, $value) = explode('.', $keyValue);
-        }
-        else {
-            $key = $keyValue;
-            $value = null;
-        }
-        if($key && isset($this->config[$key])) {
-            if($value && isset($this->config[$key][$value])) {
-                return $this->config[$key][$value];
-            }
-            else {
-                return $this->config[$key];
-            }
+        if (!isset($this->values[$section])) {
+            return null;
         }
 
+        if ($field === null) {
+            return $this->values[$section];
+        }
+
+        return $this->values[$section][$field] ?? null;
     }
 }

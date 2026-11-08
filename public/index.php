@@ -1,13 +1,15 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: MeitsWorkPc
- * Date: 18.02.2019
- * Time: 21:39
- */
 
+declare(strict_types=1);
 
-require "../vendor/autoload.php";
+require __DIR__ . '/../vendor/autoload.php';
 
-$app = require_once __DIR__.'/../bootstrap/app.php';
+use Symfony\Component\ErrorHandler\Debug;
+
+if (\getenv('APP_DEBUG') !== '0') {
+    Debug::enable();
+}
+
+/** @var \App\System\App $app */
+$app = require __DIR__ . '/../bootstrap/app.php';
 $app->run();
